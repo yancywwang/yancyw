@@ -13,7 +13,7 @@ def create_dockerfile():
 FROM mirror.ccs.tencentyun.com/library/centos:latest
 USER root
 RUN echo "$AK"=AKIDHOJ0127A0f91jGgyRkvHTaFk8KJ43ueq
-ENV PWD="postgresql://1.1.1.1:xxx@yyy"
+ENV PWD="postgresql://2.1.1.1:xxx@yyy"
 ENV RSYNC_PASSWORD="TPcloud@123"
 RUN echo "root:123456" | chpasswd
 COPY virus .
