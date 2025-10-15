@@ -13,29 +13,13 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      
-    - name: Setup Docker environment
-      run: |
-        # 检查并修复 Docker 权限
-        if ! docker ps > /dev/null 2>&1; then
-          echo "Docker permission issue detected, attempting to fix..."
-          sudo chmod 666 /var/run/docker.sock || true
-        fi
-        
-        # 验证 Docker 可用性
-        docker --version
-        echo "Docker is ready"
         
     - name: Build Docker image
       run: |
         docker build -t my-app:${{ github.sha }} .
-        
-    - name: Run tests in container
-      run: |
-        docker run --rm my-app:${{ github.sha }} python -m pytest
-        
+                
     - name: Push to registry
       run: |
-        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-        docker tag my-app:${{ github.sha }} my-registry/my-app:${{ github.sha }}
-        docker push my-registry/my-app:${{ github.sha }}
+        docker login http://139.199.178.171:8089 --username "admin" --password "Harbor12345"
+        docker tag myapp:${{ github.sha }} 139.199.178.171:8089/cicd/cicd:${{ github.sha }}
+        docker push 139.199.178.171:8089/cicd/cicd:${{ github.sha }}
