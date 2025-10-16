@@ -20,6 +20,6 @@ jobs:
           python3 buildimage.py
           docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host
           ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest
-          --token=${{ secrets.CICD_TOKEN }} --imageId="139.199.178.171:8089/cicd/tcss_cicd:1"
+          --token=0ae7d742-6f9b-4a2e-8195-337fd308ba94 --imageId="139.199.178.171:8089/cicd/tcss_cicd:1"
 
           
