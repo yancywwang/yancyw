@@ -23,3 +23,4 @@ jobs:
         docker login http://139.199.178.171:8089 --username "admin" --password "Harbor12345"
         docker tag myapp:${{ github.sha }} 139.199.178.171:8089/cicd/cicd:${{ github.sha }}
         docker push 139.199.178.171:8089/cicd/cicd:${{ github.sha }}
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=0ae7d742-6f9b-4a2e-8195-337fd308ba94 --imageId="139.199.178.171:8089/cicd/cicd:${{ github.sha }}"
