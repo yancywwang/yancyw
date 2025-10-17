@@ -39,8 +39,8 @@ jobs:
     - name: Get ImageID
       run: |  
         IMAGE_ID=$(docker images --quiet my-app:${{ github.run_id }})
-        echo "IMAGE_ID=${IMAGE_ID}" >> $GITHUB_OUTPUT
+        echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
                 
     - name: CICD Scan
       run: |
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=b46e7b4d-e22a-46b4-9fdb-70d9b6afab44 --imageId=IMAGE_ID
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=b46e7b4d-e22a-46b4-9fdb-70d9b6afab44 --imageId=${{ env.IMAGE_ID }}
