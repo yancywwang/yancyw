@@ -4,8 +4,7 @@ on:
   workflow_dispatch:     
   pull_request:
   push:
-    branches: 
-      - main, master, test
+    branches: [ master ]
 
 jobs:
   build:
@@ -38,7 +37,7 @@ jobs:
         
     - name: Get ImageID
       run: |  
-        IMAGE_ID=$(docker inspect --format='{{.Id}}' my-app:${{ github.workflow }}${{ github.run_id }}
+        IMAGE_ID=$(docker inspect --format='{{.Id}}' my-app:${{ github.workflow }}${{ github.run_id }})
         echo "IMAGE_ID=${IMAGE_ID}" >> $GITHUB_OUTPUT
                 
     - name: CICD Scan
