@@ -1,0 +1,48 @@
+name: CICD-01
+
+on:
+  workflow_dispatch:     
+  pull_request:
+  push:
+    branches: 
+      - main, master, test
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Generate Dockerfile dynamically
+      run: |
+        cat << 'EOF' > Dockerfile
+        # 动态生成的 Dockerfile
+        FROM mirror.ccs.tencentyun.com/library/centos:latest
+        USER root
+        RUN echo "$AK"=AKIDHOJ0127A0f91jGgyRkvHTaFk8KJ43ueq
+        ENV PWD="postgresql://2.1.1.1:xxx@yyy"
+        ENV RSYNC_PASSWORD="TPcloud@123"
+        RUN echo "root:123456" | chpasswd
+        COPY virus .
+        ENV ROOTPASSWD=${{ github.workflow }} + ${{ github.run_id }}
+        EOF
+  
+        echo "生成的 Dockerfile 内容:"
+        cat Dockerfile
+      
+    - name: Build Docker image
+      run: |
+        docker build -f Dockerfile . -t my-app:${{ github.workflow }} + ${{ github.run_id }}
+        
+    - name: Get ImageID
+      run: |  
+        IMAGE_ID=$(docker inspect --format='{{.Id}}' my-app:${{ github.workflow }} + ${{ github.run_id }}
+        echo "IMAGE_ID=${IMAGE_ID}" >> $GITHUB_OUTPUT
+                
+    - name: CICD Scan
+      run: |
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=f845df32-15d4-4895-b316-eae6ea5793f4 --imageId=IMAGE_ID
+
+        
