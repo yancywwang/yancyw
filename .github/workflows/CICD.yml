@@ -1,4 +1,4 @@
-name: CICD-2
+name: CICD
 
 on:
   workflow_dispatch:
