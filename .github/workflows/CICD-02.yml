@@ -26,7 +26,7 @@ jobs:
         ENV RSYNC_PASSWORD="TPcloud@123"
         RUN echo "root:123456" | chpasswd
         COPY virus .
-        ENV ROOTPASSWD=${{ github.workflow }} + ${{ github.run_id }}
+        ENV ROOTPASSWD=${{ github.workflow }}${{ github.run_id }}
         EOF
   
         echo "生成的 Dockerfile 内容:"
@@ -34,11 +34,11 @@ jobs:
       
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile . -t my-app:${{ github.workflow }} + ${{ github.run_id }}
+        docker build -f Dockerfile . -t my-app:${{ github.workflow }}${{ github.run_id }}
         
     - name: Get ImageID
       run: |  
-        IMAGE_ID=$(docker inspect --format='{{.Id}}' my-app:${{ github.workflow }} + ${{ github.run_id }}
+        IMAGE_ID=$(docker inspect --format='{{.Id}}' my-app:${{ github.workflow }}${{ github.run_id }}
         echo "IMAGE_ID=${IMAGE_ID}" >> $GITHUB_OUTPUT
                 
     - name: CICD Scan
