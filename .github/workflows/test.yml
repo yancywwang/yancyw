@@ -2,7 +2,29 @@ name: TEST
 
 on:
   workflow_dispatch:
+    inputs: 
+      environment:
+        description: '部署环境'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+      version:
+        description: '镜像版本'
+        required: false
+        default: 'latest'
+        type: string
+      run_tests:
+        description: '运行测试'
+        required: false
+        default: true
+        type: boolean
+        
   pull_request:
+    branches: 
+      - test
   push:
     branches: 
       - test
