@@ -20,20 +20,19 @@ jobs:
         # 动态生成的 Dockerfile
         FROM mirror.ccs.tencentyun.com/library/centos:latest
         USER root
+        ENV ROOTPASSWD=${{ github.workflow }}${{ github.run_id }}
         RUN echo "$AK"=AKIDHOJ0127A0f91jGgyRkvHTaFk8KJ43ueq
         ENV PWD="postgresql://2.1.1.1:xxx@yyy"
         ENV RSYNC_PASSWORD="TPcloud@123"
         RUN echo "root:123456" | chpasswd
         COPY virus .
-        ENV ROOTPASSWD=${{ github.workflow }}${{ github.run_id }}
         EOF
-  
         echo "生成的 Dockerfile 内容:"
         cat Dockerfile
       
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile . -t --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') my-app:${{ github.workflow }}${{ github.run_id }}
+        docker build -f Dockerfile . --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') -t my-app:${{ github.workflow }}${{ github.run_id }}
         
     - name: Get ImageID
       run: |  
