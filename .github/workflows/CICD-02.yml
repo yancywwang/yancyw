@@ -33,7 +33,7 @@ jobs:
       
     - name: Build Docker image
       run: |
-        docker build -f Dockerfile . -t my-app:${{ github.workflow }}${{ github.run_id }}
+        docker build -f Dockerfile . -t --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') my-app:${{ github.workflow }}${{ github.run_id }}
         
     - name: Get ImageID
       run: |  
