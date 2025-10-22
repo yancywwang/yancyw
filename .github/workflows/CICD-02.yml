@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-CICD-02:
     runs-on: [self-hosted, VM-255-162-tencentos]
 
     steps:
