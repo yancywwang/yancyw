@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-CICD-02:
-    runs-on: [self-hosted, VM-255-162-tencentos]
+    runs-on: self-hosted
 
     steps:
     - name: Checkout code
