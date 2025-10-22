@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  build:
+  build-CICD-ARM:
     runs-on: [self-hosted, VM-8-54-tencentos]
 
     steps:
