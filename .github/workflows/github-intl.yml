@@ -1,0 +1,50 @@
+name: github-intl
+
+on:
+  workflow_dispatch:     
+  pull_request:
+  push:
+    branches: [ master ]
+
+jobs:
+  Github-intl:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Generate Dockerfile dynamically
+      run: |
+        cat << 'EOF' > Dockerfile
+        # 动态生成的 Dockerfile
+        FROM mirror.ccs.tencentyun.com/library/centos:latest
+        USER root
+        ENV ROOTPASSWD=${{ github.workflow }}${{ github.run_id }}
+        RUN echo "$AK"=AKIDHOJ0127A0f91jGgyRkvHTaFk8KJ43ueq
+        ENV PWD="postgresql://2.1.1.1:xxx@yyy"
+        ENV RSYNC_PASSWORD="TPcloud@123"
+        RUN echo "root:123456" | chpasswd
+        COPY virus .
+        EOF
+        echo "生成的 Dockerfile 内容:"
+        cat Dockerfile
+      
+    - name: Build Docker image
+      run: |
+        docker build -f Dockerfile . -t my-app:${{ github.workflow }}${{ github.run_id }}
+        
+    - name: Get ImageID
+      run: |  
+        IMAGE_ID=$(docker inspect --format='{{.Id}}' my-app:${{ github.workflow }}${{ github.run_id }})
+        echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
+
+    - name: Push to registry
+      run: |
+        docker login http://139.199.178.171:8089 --username "admin" --password "Harbor12345"
+        docker tag my-app:${{ github.workflow }}${{ github.run_id }} 139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
+        docker push 139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
+                
+    - name: CICD Scan
+      run: |
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=0ae7d742-6f9b-4a2e-8195-337fd308ba94 --imageId=${{ env.IMAGE_ID }}
