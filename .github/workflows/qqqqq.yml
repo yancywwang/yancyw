@@ -1,0 +1,26 @@
+name: Docker build and scan security issue by cicd-scanner
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  REPO_TAG: "your_docker_image_repo:your_docker_image_tag"
+
+jobs:
+  build:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Scan image by cicd-scanner
+        run: |
+          docker run --rm \
+            -v /var/run/docker.sock:/var/run/docker.sock \
+            --network=host \
+            ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest \
+            --token=767bfd23-a55b-413a-b31a-fb012d334db2 \
+            --imageId=e1a2608975d4
