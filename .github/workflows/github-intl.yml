@@ -45,8 +45,8 @@ jobs:
         docker tag my-app:${{ github.workflow }}${{ github.run_id }} 139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
         docker push 139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
         
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=6da28d5c-1437-4c02-86d4-41901d383fda --imageId=139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=a99c5d4a-68d9-4451-9d16-5560a42d026b --imageId=139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
                 
     - name: CICD Scan
       run: |
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=6da28d5c-1437-4c02-86d4-41901d383fda --imageId=${{ env.IMAGE_ID }}
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=a99c5d4a-68d9-4451-9d16-5560a42d026b --imageId=${{ env.IMAGE_ID }}
