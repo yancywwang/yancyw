@@ -48,4 +48,4 @@ jobs:
     - name: CICD Scan
       run: |
         # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:5.3.3.205 --token=bdd3d2cd-a065-4253-a277-3c988a3a297a --imageId=${{ env.IMAGE_ID }}
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host --pull always ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=bdd3d2cd-a065-4253-a277-3c988a3a297a --imageId=${{ env.IMAGE_ID }}
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host --pull always ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=87e7292d-a228-4acd-babd-216d9fc53261 --imageId=${{ env.IMAGE_ID }}
