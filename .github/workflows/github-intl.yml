@@ -18,7 +18,7 @@ jobs:
       run: |
         cat << 'EOF' > Dockerfile
         # 动态生成的 Dockerfile
-        FROM mirror.ccs.tencentyun.com/library/centos:latest
+        FROM centos:latest
         USER root
         ENV ROOTPASSWD=${{ github.workflow }}${{ github.run_id }}
         RUN echo "$AK"=AKIDHOJ0127A0f91jGgyRkvHTaFk8KJ43ueq
