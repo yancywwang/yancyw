@@ -39,14 +39,14 @@ jobs:
         IMAGE_ID=$(docker inspect --format='{{.Id}}' my-app:${{ github.workflow }}${{ github.run_id }})
         echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
 
-    - name: Push to registry
-      run: |
-        docker login http://139.199.178.171:8089 --username "admin" --password "Harbor12345"
-        docker tag my-app:${{ github.workflow }}${{ github.run_id }} 139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
-        docker push 139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
+    # - name: Push to registry
+    #   run: |
+    #     docker login http://139.199.178.171:8089 --username "admin" --password "Harbor12345"
+    #     docker tag my-app:${{ github.workflow }}${{ github.run_id }} 139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
+    #     docker push 139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
         
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=a99c5d4a-68d9-4451-9d16-5560a42d026b --imageId=139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
+    #     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=a99c5d4a-68d9-4451-9d16-5560a42d026b --imageId=139.199.178.171:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
                 
     - name: CICD Scan
       run: |
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=a99c5d4a-68d9-4451-9d16-5560a42d026b --imageId=${{ env.IMAGE_ID }}
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host --pull always ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=a193167c-75ff-4d02-875a-9daa29aecbde --imageId=${{ env.IMAGE_ID }}
