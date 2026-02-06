@@ -49,4 +49,4 @@ jobs:
       run: |
         # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:5.3.3.205 --token=bdd3d2cd-a065-4253-a277-3c988a3a297a --imageId=${{ env.IMAGE_ID }}
         # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host --pull always ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=bdd3d2cd-a065-4253-a277-3c988a3a297a --imageId=${{ env.IMAGE_ID }} --debugMode true
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host --pull always ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=bdd3d2cd-a065-4253-a277-3c988a3a297a --imageId=${{ env.IMAGE_ID }}
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host --pull always   ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:5.3.4.27  --token=6c366e99-dc95-443b-8cdc-804af629c45b  --imageId=${{ env.IMAGE_ID }} --debugMode true
