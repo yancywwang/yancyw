@@ -1,0 +1,170 @@
+name: IaC-tf
+
+on:
+  workflow_dispatch:     
+  pull_request:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Generate Dockerfile dynamically
+      run: |
+        cat << 'EOF' > tf.${{ github.run_id }}
+        # ============================================================
+        # TencentCloud Terraform Test Cases for KICS Security Rules
+        # ============================================================
+        
+        # ------------------------------------------------------------
+        # UNSAFE: Security Group accepts all traffic (0.0.0.0/0 + ALL)
+        # Rule: TencentCloud Security Group Accepts All Traffic
+        # ------------------------------------------------------------
+        resource "tencentcloud_security_group_rule_set" "unsafe_sg" {
+          security_group_id = "sg-12345678"
+        
+          ingress {
+            action      = "ACCEPT"
+            cidr_block  = "0.0.0.0/0"
+            protocol    = "ALL"
+            port        = "ALL"
+            description = "UNSAFE: Allow all traffic from anywhere"
+          }
+        }
+        
+        # ------------------------------------------------------------
+        # UNSAFE: CDB instance with internet service enabled
+        # Rule: TencentCloud CDB Internet Service Enabled
+        # ------------------------------------------------------------
+        resource "tencentcloud_mysql_instance" "cdb_public" {
+          instance_name     = "test-cdb-public"
+          engine_version    = "5.7"
+          charge_type       = "POSTPAID"
+          root_password     = "PassWord123"
+          slave_deploy_mode = 0
+          availability_zone = "ap-guangzhou-3"
+          slave_sync_mode   = 1
+          mem_size          = 4000
+          volume_size       = 200
+          vpc_id            = "vpc-12345678"
+          subnet_id         = "subnet-12345678"
+          internet_service  = 1      # UNSAFE: Internet access enabled
+          intranet_port     = 3306   # UNSAFE: Default port
+          security_groups   = ["sg-12345678"]
+        }
+        
+        # ------------------------------------------------------------
+        # UNSAFE: CVM instance with public IP allocated
+        # Rule: TencentCloud CVM Has Public IP
+        # ------------------------------------------------------------
+        resource "tencentcloud_instance" "cvm_public_ip" {
+          instance_name      = "test-cvm-public"
+          availability_zone  = "ap-guangzhou-3"
+          image_id           = "img-eb30mz89"
+          instance_type      = "S5.MEDIUM4"
+          system_disk_type   = "CLOUD_PREMIUM"
+          system_disk_size   = 50
+          vpc_id             = "vpc-12345678"
+          subnet_id          = "subnet-12345678"
+          allocate_public_ip = true  # UNSAFE: Public IP allocated
+        }
+        
+        # ------------------------------------------------------------
+        # UNSAFE: CLB instance without logging enabled
+        # Rule: TencentCloud CLB Log Disabled
+        # ------------------------------------------------------------
+        resource "tencentcloud_clb_instance" "clb_no_log" {
+          clb_name     = "test-clb-no-log"
+          network_type = "INTERNAL"
+          vpc_id       = "vpc-12345678"
+          subnet_id    = "subnet-12345678"
+          # UNSAFE: No log_set_id and log_topic_id configured
+        }
+        
+        # ============================================================
+        # SAFE CONFIGURATIONS (should NOT trigger alerts)
+        # ============================================================
+        
+        # ------------------------------------------------------------
+        # SAFE: CVM instance without public IP
+        # ------------------------------------------------------------
+        resource "tencentcloud_instance" "cvm_safe" {
+          instance_name      = "safe-cvm"
+          availability_zone  = "ap-guangzhou-3"
+          image_id           = "img-eb30mz89"
+          instance_type      = "S5.MEDIUM4"
+          system_disk_type   = "CLOUD_PREMIUM"
+          system_disk_size   = 50
+          vpc_id             = "vpc-12345678"
+          subnet_id          = "subnet-12345678"
+          allocate_public_ip = false  # SAFE: No public IP
+        }
+        
+        # ------------------------------------------------------------
+        # SAFE: CDB instance with internet service disabled and non-default port
+        # ------------------------------------------------------------
+        resource "tencentcloud_mysql_instance" "cdb_safe" {
+          instance_name     = "safe-cdb"
+          engine_version    = "5.7"
+          charge_type       = "POSTPAID"
+          root_password     = "PassWord123"
+          slave_deploy_mode = 0
+          availability_zone = "ap-guangzhou-3"
+          slave_sync_mode   = 1
+          mem_size          = 4000
+          volume_size       = 200
+          vpc_id            = "vpc-12345678"
+          subnet_id         = "subnet-12345678"
+          internet_service  = 0      # SAFE: Internet access disabled
+          intranet_port     = 13306  # SAFE: Non-default port
+          security_groups   = ["sg-12345678"]
+        }
+        
+        # ------------------------------------------------------------
+        # SAFE: CLB instance with logging enabled
+        # ------------------------------------------------------------
+        resource "tencentcloud_clb_instance" "clb_with_log" {
+          clb_name     = "safe-clb-with-log"
+          network_type = "INTERNAL"
+          vpc_id       = "vpc-12345678"
+          subnet_id    = "subnet-12345678"
+          log_set_id   = "logset-12345678"  # SAFE: Logging enabled
+          log_topic_id = "topic-12345678"   # SAFE: Log topic configured
+        }
+        
+        # ------------------------------------------------------------
+        # SAFE: Security Group with restricted access
+        # ------------------------------------------------------------
+        resource "tencentcloud_security_group_rule_set" "safe_sg" {
+          security_group_id = "sg-87654321"
+        
+          ingress {
+            action      = "ACCEPT"
+            cidr_block  = "10.0.0.0/16"  # SAFE: Internal network only
+            protocol    = "TCP"
+            port        = "443"
+            description = "SAFE: Allow HTTPS from internal network"
+          }
+        
+          ingress {
+            action      = "ACCEPT"
+            cidr_block  = "192.168.1.0/24"  # SAFE: Specific subnet
+            protocol    = "TCP"
+            port        = "22"
+            description = "SAFE: Allow SSH from specific subnet"
+          }
+        }
+
+        EOF
+  
+        echo "生成的 Dockerfile 内容:"
+        cat tf.${{ github.run_id }}
+                
+    - name: CICD Scan
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/home/test ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:5.3.0.30 --token=0be94e16-97db-4f31-8446-4faa15c747f2 --task iac --iacPath /home/test --debugMode=true
