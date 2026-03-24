@@ -1,0 +1,66 @@
+name: IaC-yaml
+
+on:
+  workflow_dispatch:     
+  pull_request:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Generate Dockerfile dynamically
+      run: |
+        cat << 'EOF' > k8s.${{ github.run_id }}
+        apiVersion: v1
+        kind: Pod
+        metadata:
+          name: socket-mount-test
+          labels:
+            app: test
+        spec:
+          containers:
+            - name: tester
+              image: busybox
+              command: ["sleep", "3600"]
+              volumeMounts:
+                - mountPath: /var/run/docker.sock
+                  name: docker-sock
+                - mountPath: /var/run/containerd/containerd.sock
+                  name: containerd-sock-var
+                - mountPath: /run/containerd/containerd.sock
+                  name: containerd-sock-run
+                - mountPath: /tmp/normal
+                  name: normal-volume
+          volumes:
+            - name: docker-sock
+              hostPath:
+                path: /var/run/docker.sock
+                type: Socket
+        
+            - name: containerd-sock-var
+              hostPath:
+                path: /var/run/containerd/containerd.sock
+                type: Socket
+        
+            - name: containerd-sock-run
+              hostPath:
+                path: /run/containerd/containerd.sock
+                type: Socket
+        
+            - name: normal-volume
+              emptyDir: {}
+
+        EOF
+  
+        echo "生成的 Dockerfile 内容:"
+        cat k8s.${{ github.run_id }}
+                
+    - name: CICD Scan
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/home/test ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:5.3.0.30 --token=0b2f7d99-4d85-4b47-850a-073e87087bf1 --task iac --iacPath /home/test --debugMode=true
