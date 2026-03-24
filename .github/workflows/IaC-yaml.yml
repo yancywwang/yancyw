@@ -16,7 +16,7 @@ jobs:
 
     - name: Generate Dockerfile dynamically
       run: |
-        cat << 'EOF' > k8s.${{ github.run_id }}
+        cat << 'EOF' > ${{ github.run_id }}.yaml
         apiVersion: v1
         kind: Pod
         metadata:
@@ -58,8 +58,8 @@ jobs:
 
         EOF
   
-        echo "生成的 Dockerfile 内容:"
-        cat k8s.${{ github.run_id }}
+        echo "生成的 文件内容:"
+        cat ${{ github.run_id }}.yaml
                 
     - name: CICD Scan
       run: |
