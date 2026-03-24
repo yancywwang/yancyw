@@ -17,7 +17,7 @@ jobs:
 
     - name: Generate Dockerfile dynamically
       run: |
-        cat << 'EOF' > Dockerfile
+        cat << 'EOF' > Dockerfile.${{ github.run_id }}
         # 动态生成的 Dockerfile
         FROM mirror.ccs.tencentyun.com/library/centos:latest
         USER root
@@ -32,15 +32,15 @@ jobs:
         echo "生成的 Dockerfile 内容:"
         cat Dockerfile
       
-    - name: Build Docker image
-      run: |
-        docker build -f Dockerfile . -t my-app:${{ github.run_id }}
+    # - name: Build Docker image
+    #   run: |
+    #     docker build -f Dockerfile . -t my-app:${{ github.run_id }}
         
-    - name: Get ImageID
-      run: |  
-        IMAGE_ID=$(docker images --quiet my-app:${{ github.run_id }})
-        echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
+    # - name: Get ImageID
+    #   run: |  
+    #     IMAGE_ID=$(docker images --quiet my-app:${{ github.run_id }})
+    #     echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
                 
     - name: CICD Scan
       run: |
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=b46e7b4d-e22a-46b4-9fdb-70d9b6afab44 --imageId=${{ env.IMAGE_ID }}
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=0be94e16-97db-4f31-8446-4faa15c747f2 --imageId=Dockerfile.${{ github.run_id }}
