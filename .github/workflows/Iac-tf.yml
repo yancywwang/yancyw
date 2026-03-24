@@ -16,7 +16,7 @@ jobs:
 
     - name: Generate Dockerfile dynamically
       run: |
-        cat << 'EOF' > tf.${{ github.run_id }}
+        cat << 'EOF' > ${{ github.run_id }}.tf
         # ============================================================
         # TencentCloud Terraform Test Cases for KICS Security Rules
         # ============================================================
@@ -162,8 +162,8 @@ jobs:
 
         EOF
   
-        echo "生成的 Dockerfile 内容:"
-        cat tf.${{ github.run_id }}
+        echo "生成的 文件内容:"
+        cat ${{ github.run_id }}.tf
                 
     - name: CICD Scan
       run: |
