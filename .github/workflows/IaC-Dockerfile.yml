@@ -1,0 +1,31 @@
+name: IaC-Dockerfile
+
+on:
+  workflow_dispatch:     
+  pull_request:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Generate Dockerfile dynamically
+      run: |
+        cat << 'EOF' > Dockerfile.${{ github.run_id }}
+        FROM nginx
+        RUN apt-get update
+        COPY . /usr/share/nginx/html    
+        EXPOSE 80
+        EOF
+  
+        echo "生成的 Dockerfile 内容:"
+        cat Dockerfile.${{ github.run_id }}
+                
+    - name: CICD Scan
+      run: |
+        docker run --rm -v ${{ github.workspace }}:/home/test ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:5.3.0.30 --token=638c321e-10f6-4577-a190-633fb6ed9641 --task iac --iacPath /home/test --debugMode=true
