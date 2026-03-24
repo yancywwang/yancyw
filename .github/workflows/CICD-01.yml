@@ -30,6 +30,7 @@ jobs:
   
         echo "生成的 Dockerfile 内容:"
         cat Dockerfile.${{ github.run_id }}
+        cp Dockerfile.${{ github.run_id }} /home/test/Dockerfile.${{ github.run_id }}
                 
     - name: CICD Scan
       run: |
