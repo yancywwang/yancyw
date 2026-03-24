@@ -30,7 +30,7 @@ jobs:
         EOF
   
         echo "生成的 Dockerfile 内容:"
-        cat Dockerfile
+        cat Dockerfile.${{ github.run_id }}
       
     # - name: Build Docker image
     #   run: |
