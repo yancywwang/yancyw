@@ -25,4 +25,4 @@ jobs:
                 
     - name: CICD Scan
       run: |
-        docker run --rm -v ${{ github.workspace }}:/home/test ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=e740ad40-09b0-4704-b646-f7cee7a60cef --task iac --iacPath /home/test/Dockerfile.${{ github.run_id }} --debugMode=true
+        docker run --rm -v ${{ github.workspace }}:/home/test ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:5.3.0.39 --token=e740ad40-09b0-4704-b646-f7cee7a60cef --task iac --iacPath /home/test/Dockerfile.${{ github.run_id }} --debugMode=true
