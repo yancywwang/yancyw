@@ -25,4 +25,4 @@ jobs:
                 
     - name: CICD Scan
       run: |
-        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /home/test:/home/test --network=host --pull always ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=156699e1-8135-4346-b266-e7efd045a15f --task iac --iacPath /home/test
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v /home/test:/home/test --network=host --pull always ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=8dfdd5fc-ae2f-4cb2-9574-6bea82f26a5a --task iac --iacPath /home/test
