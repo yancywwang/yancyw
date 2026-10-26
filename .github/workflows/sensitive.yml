@@ -1,0 +1,62 @@
+name: CICD-02
+
+on:
+  workflow_dispatch:     
+  pull_request:
+  push:
+    branches: [ master ]
+  schedule:
+    - cron: '0 * * * *'
+
+jobs:
+  build-CICD-02:
+    runs-on: self-hosted
+
+    steps:
+    # - name: Checkout code
+    #   uses: actions/checkout@v4
+
+    - name: Generate Dockerfile dynamically
+      run: |
+        cat << 'EOF' > Dockerfile
+        # 动态生成的 Dockerfile
+        FROM centos:latest
+        USER root
+        WORKDIR /samples
+        ENV ROOTPASSWD=${{ github.workflow }}${{ github.run_id }}
+        RUN echo "$AK"=AKIDHOJ0127A0f91jGgyRkvHTaFk8KJ43ueq
+        ENV PWD="postgresql://2.1.1.1:xxx@yyy"
+        ENV RSYNC_PASSWORD="TPcloud@123"
+        RUN echo "root:123456" | chpasswd
+        COPY virus .
+        COPY by-rule/ /samples/by-rule/
+        COPY manifest.json /samples/manifest.json
+        COPY README.md /samples/README.md
+        RUN set -eux; \
+            find /samples -type f -maxdepth 3 -print | sort > /samples/file-list.txt; \
+            chmod -R a+rX /samples
+
+        CMD ["sh", "-c", "echo 'Synthetic sensitive-file samples are under /samples/by-rule'; find /samples/by-rule -type f -maxdepth 1 -print | sort"]
+        EOF
+        echo "生成的 Dockerfile 内容:"
+        cat Dockerfile
+      
+    - name: Build Docker image
+      run: |
+        sudo docker build -f Dockerfile . -t my-app:${{ github.workflow }}${{ github.run_id }}
+        
+    - name: Get ImageID
+      run: |  
+        IMAGE_ID=$(sudo docker inspect --format='{{.Id}}' my-app:${{ github.workflow }}${{ github.run_id }})
+        echo "IMAGE_ID=$IMAGE_ID" >> $GITHUB_ENV
+
+    - name: Push to registry
+      run: |
+        sudo docker login http://43.139.76.238:8089 --username "admin" --password "Harbor12345"
+        sudo docker tag my-app:${{ github.workflow }}${{ github.run_id }} 43.139.76.238:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
+        sudo docker push 43.139.76.238:8089/cicd/github-test:${{ github.workflow }}${{ github.run_id }}
+                
+    - name: CICD Scan
+      run: |
+        sudo docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host --pull always   ccr.ccs.tencentyun.com/yunjing_agent/csipcicd:5.3.0.15  --token=2c7d3e8d-66d9-4590-9baa-d3dee72ac1f1  --imageId=${{ env.IMAGE_ID }}
+        # docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host --pull always ccr.ccs.tencentyun.com/yunjing_agent/csipcicd:v1 --token=2c7d3e8d-66d9-4590-9baa-d3dee72ac1f1 --imageId=${{ env.IMAGE_ID }} --task imagescan,iac
