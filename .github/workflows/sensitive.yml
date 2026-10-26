@@ -30,13 +30,13 @@ jobs:
         RUN echo "root:123456" | chpasswd
         COPY virus .
         COPY by-rule/ /samples/by-rule/
+        COPY maven/ /samples/maven/
         COPY manifest.json /samples/manifest.json
         COPY README.md /samples/README.md
         RUN set -eux; \
-            find /samples -type f -maxdepth 3 -print | sort > /samples/file-list.txt; \
+            find /samples -maxdepth 4 -type f -print | sort > /samples/file-list.txt; \
             chmod -R a+rX /samples
-
-        CMD ["sh", "-c", "echo 'Synthetic sensitive-file samples are under /samples/by-rule'; find /samples/by-rule -type f -maxdepth 1 -print | sort"]
+        CMD ["sh", "-c", "echo 'Synthetic sensitive-file samples are under /samples'; find /samples -maxdepth 4 -type f -print | sort"]
         EOF
         echo "生成的 Dockerfile 内容:"
         cat Dockerfile
