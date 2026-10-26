@@ -1,4 +1,4 @@
-name: CICD-1026
+name: CICD-2
 
 on:
   workflow_dispatch:     
