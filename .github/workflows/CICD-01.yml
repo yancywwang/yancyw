@@ -10,7 +10,10 @@ jobs:
   build:
     runs-on: self-hosted
 
-    steps:                
+    steps: 
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: CICD Scan
       run: |
         docker run --rm -v /home/test/yancyw:/root ccr.ccs.tencentyun.com/yunjing_agent/cicdscanner:latest --token=704f40eb-fe7c-4b1a-bde9-440732ed0eca --task iac --iacPath /root
